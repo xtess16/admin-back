@@ -95,7 +95,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'sdocs.wsgi.application'
-AUTH_USER_MODEL = 'apps.Users'
+AUTH_USER_MODEL = 'users.User'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -107,7 +107,7 @@ DATABASES = {
         'USER': config('DB_NAME'),
         'PASSWORD': config('DB_PW'),
         'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'PORT': config('DB_PORT'),
     }
 }
 

@@ -74,6 +74,27 @@ class UserViewSet(viewsets.ViewSet):
             'groups': groups_ser.data
         }, safe=False)
 
+    # Создать/обновить пользователя
+    @action(detail=False, methods=['post', 'put'], url_path='user-save')
+    @transaction.atomic
+    def user_save(self, request):
+        operator_req = request.data.get('user')
+        try:
+            with transaction.atomic():
+                if request.method == 'POST':  # create
+                    serializer = UserSerializer(data=operator_req)
+                if request.method == 'PUT':  # update
+                    operator = User.objects.get(id=operator_req['id'])
+                    serializer = UserSerializer(operator, data=operator_req)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return JsonResponse({
+                    'user': serializer.data
+                }, safe=False)
+        except IntegrityError as err:
+            log_err(err)
+            return JsonResponse({}, status=500)
+
 
 class GroupViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAdminUser]

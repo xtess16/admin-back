@@ -1,5 +1,13 @@
 """
 Пользователь
+
+MANAGER - доступ ко всей информации (только чтение).
+OPERATOR - доступ ко всей информации (только чтение, редактирование).
+CHIEF_OPERATOR(Главный оператор) - доступ ко всей информации без ограничений.
+IT_DEVELOPER(IT разработчик/владелец) - доступ ко всей информации без ограничений.
+
+После выполнения всех миграций и fixtures права добавляются автоматически
+в файле admin_panel_init_data.py
 """
 
 from django.contrib.auth.models import AbstractBaseUser
@@ -12,6 +20,8 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin, AbstractBaseSave):
+    MANAGER, OPERATOR, CHIEF_OPERATOR, IT_DEVELOPER = 1, 2, 3, 4
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.CharField("Аккаунт", max_length=50, unique=True)
     email = models.EmailField("E-mail", unique=True)
