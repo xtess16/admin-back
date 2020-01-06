@@ -1,7 +1,7 @@
 #!/bin/bash
 # Перед запуском скрипта необходимо удалить схему public вручную и заново создать её(со всеми правами)
 # Запустить скрипт из папки api:
-# sh scripts/init/reinit.sh
+# sh scripts/start/reinit.sh
 #
 # Удалить все файлы миграций (опционально)
 find ./apps/ -path '*/migrations/*.py' -not -name '__init__.py' -delete;

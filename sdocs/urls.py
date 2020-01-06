@@ -19,7 +19,7 @@ from rest_framework import routers
 from apps.users.views import UserViewSet, GroupViewSet
 
 router = routers.DefaultRouter()
-router.register(r'admin/groups', GroupViewSet, basename='group')
+router.register(r'admin', GroupViewSet, basename='group')
 router.register(r'admin/users', UserViewSet, basename='user')
 
 urlpatterns = [

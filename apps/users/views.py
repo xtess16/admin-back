@@ -11,7 +11,6 @@ from services.common.logging import log_err
 from .models import User
 from .serializers import UserSerializer, GroupSerializer, PermissionSerializer
 
-
 @api_view(['POST'])
 def check_auth(request):
     # Проверка аутентификации оператора
@@ -21,8 +20,7 @@ def check_auth(request):
         auth_info = {}
         if request.user.is_staff:
             _groups = Group.objects.all()
-            _permissions = Permission.objects.all()\
-                .exclude(content_type__model__in=['logentry', 'permission', 'group', 'contenttype'])
+            _permissions = get_permissions_with_exclude()
             groups_ser = GroupSerializer(_groups, many=True)
             permissions_ser = PermissionSerializer(_permissions, many=True)
             auth_info = {
@@ -39,6 +37,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
+        print(user)
         refresh = self.get_token(user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
@@ -104,8 +103,7 @@ class GroupViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'], url_path='groups-permissions-list')
     def groups_permissions_list(self, request):
         groups = Group.objects.all()
-        permissions = Permission.objects.all() \
-            .exclude(content_type__model__in=['logentry', 'permission', 'group', 'contenttype'])
+        permissions = get_permissions_with_exclude()
         groups_ser = GroupSerializer(groups, many=True)
         permissions_ser = PermissionSerializer(permissions, many=True)
         auth_info = {
@@ -164,3 +162,10 @@ def user_group_save(request):
         group = Group.objects.get(id=group_id)
         user.groups.add(group) if is_checked else user.groups.remove(group)
         return JsonResponse({}, safe=False)
+
+
+def get_permissions_with_exclude():
+    return Permission.objects.all() \
+            .exclude(
+        content_type__model__in=['logentry', 'permission','group',
+                                 'contenttype', 'session'])
