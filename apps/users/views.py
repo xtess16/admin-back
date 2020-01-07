@@ -11,25 +11,23 @@ from services.common.logging import log_err
 from .models import User
 from .serializers import UserSerializer, GroupSerializer, PermissionSerializer
 
+
 @api_view(['POST'])
 def check_auth(request):
     # Проверка аутентификации оператора
     if request.method == 'POST':
         user = User.objects.get(account=request.user.account)
         user_ser = UserSerializer(user)
-        auth_info = {}
-        if request.user.is_staff:
-            _groups = Group.objects.all()
-            _permissions = get_permissions_with_exclude()
-            groups_ser = GroupSerializer(_groups, many=True)
-            permissions_ser = PermissionSerializer(_permissions, many=True)
-            auth_info = {
+        _groups = Group.objects.all()
+        _permissions = get_permissions_with_exclude()
+        groups_ser = GroupSerializer(_groups, many=True)
+        permissions_ser = PermissionSerializer(_permissions, many=True)
+        return JsonResponse({
+            'user': user_ser.data,
+            'info': {
                 'groups': groups_ser.data,
                 'permissions': permissions_ser.data
             }
-        return JsonResponse({
-            'user': user_ser.data,
-            'info': auth_info
         }, safe=False)
 
 
@@ -65,12 +63,9 @@ class UserViewSet(viewsets.ViewSet):
     def list(self, request):
         staff_condition = None if request.user.is_staff else True
         users = User.objects.all().exclude(is_staff=staff_condition)
-        groups = Group.objects.all()
         users_ser = UserSerializer(users, many=True)
-        groups_ser = GroupSerializer(groups, many=True)
         return JsonResponse({
-            'users': users_ser.data,
-            'groups': groups_ser.data
+            'users': users_ser.data
         }, safe=False)
 
     # Создать/обновить пользователя
