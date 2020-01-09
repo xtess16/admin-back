@@ -14,7 +14,7 @@ from .serializers import UserSerializer, GroupSerializer, PermissionSerializer
 
 @api_view(['POST'])
 def check_auth(request):
-    # Проверка аутентификации оператора
+    # Проверка аутентификации пользователя
     if request.method == 'POST':
         user = User.objects.get(account=request.user.account)
         user_ser = UserSerializer(user)
@@ -22,8 +22,12 @@ def check_auth(request):
         _permissions = get_permissions_with_exclude()
         groups_ser = GroupSerializer(_groups, many=True)
         permissions_ser = PermissionSerializer(_permissions, many=True)
+        staff_condition = None if request.user.is_staff else True
+        users = User.objects.all().exclude(is_staff=staff_condition)
+        users_ser = UserSerializer(users, many=True)
         return JsonResponse({
             'user': user_ser.data,
+            'users': users_ser.data,
             'info': {
                 'groups': groups_ser.data,
                 'permissions': permissions_ser.data
@@ -35,7 +39,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
         user = self.user
-        print(user)
         refresh = self.get_token(user)
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
@@ -69,17 +72,18 @@ class UserViewSet(viewsets.ViewSet):
         }, safe=False)
 
     # Создать/обновить пользователя
-    @action(detail=False, methods=['post', 'put'], url_path='user-save')
+    @action(detail=False, methods=['post', 'put'], url_path='save')
     @transaction.atomic
-    def user_save(self, request):
-        operator_req = request.data.get('user')
+    def save(self, request):
+        user_req = request.data.get('user')
         try:
             with transaction.atomic():
                 if request.method == 'POST':  # create
-                    serializer = UserSerializer(data=operator_req)
+                    serializer = UserSerializer(data=user_req)
                 if request.method == 'PUT':  # update
-                    operator = User.objects.get(id=operator_req['id'])
-                    serializer = UserSerializer(operator, data=operator_req)
+                    print(1, )
+                    user = User.objects.get(id=user_req['id'])
+                    serializer = UserSerializer(user, data=user_req)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return JsonResponse({
@@ -150,10 +154,10 @@ def group_permission_save(request):
 def user_group_save(request):
     # Добавить пользователя в группу, удалить из группы
     if request.method == 'POST':
-        operator_id = request.data.get('operator_id')
+        user_id = request.data.get('user_id')
         group_id = request.data.get('group_id')
         is_checked = request.data.get('is_checked')
-        user = User.objects.get(id=operator_id)
+        user = User.objects.get(id=user_id)
         group = Group.objects.get(id=group_id)
         user.groups.add(group) if is_checked else user.groups.remove(group)
         return JsonResponse({}, safe=False)

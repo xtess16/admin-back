@@ -32,6 +32,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'email',
+            'first_name',
+            'last_name',
             'is_staff',
             'is_active',
             'last_login',
@@ -54,7 +56,10 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
+        print(2, validated_data)
         instance.email = validated_data.get('email', instance.email)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.password_is_generate = validated_data.get('password_is_generate', instance.password_is_generate)
         instance.remember_me = validated_data.get('remember_me', instance.remember_me)
         if instance.is_superuser is not True:

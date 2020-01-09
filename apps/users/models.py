@@ -25,8 +25,8 @@ class User(AbstractBaseUser, PermissionsMixin, AbstractBaseSave):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.CharField("Аккаунт", max_length=50, unique=True)
     email = models.EmailField("E-mail", unique=True)
-    first_name = models.CharField("Имя", max_length=50, blank=True, null=True)
-    last_name = models.CharField("Фамилия", max_length=50, blank=True, null=True)
+    first_name = models.CharField("Имя", max_length=50, blank=True)
+    last_name = models.CharField("Фамилия", max_length=50, blank=True)
     # Пароль был сгенерирован сервером или создан пользователем
     password_is_generate = models.BooleanField(default=True)
     remember_me = models.BooleanField(default=False)
