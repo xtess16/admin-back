@@ -8,7 +8,9 @@ services:
       - POSTGRES_USER=sdocs
       - POSTGRES_PASSWORD=1234
       - POSTGRES_DB=sdocs
-  web:
+    ports:
+      - "5433:5432"
+  admin_api:
     build: .
     environment:
       - DB_HOST=db
