@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:10.1-alpine
+    container_name: sdocs_db
+    environment:
+      - POSTGRES_USER=sdocs
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=sdocs
+  web:
+    build: .
+    environment:
+      - DB_HOST=db
+      - DB_NAME=sdocs
+      - DB_PW=1234
+    container_name: sdocs_api
+    command: bash -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py create_superuser &&
+      python manage.py loaddata fixtures.json &&
+      python manage.py shell < scripts/seeders/admin_panel_init_data.py &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    volumes:
+      - .:/code
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+    links:
+      - db
