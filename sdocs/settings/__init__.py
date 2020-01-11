@@ -104,17 +104,6 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # 'NAME': 'postgres',
-        # 'USER': 'postgres',
-        # 'HOST': 'db',
-        # 'PORT': 5432,
-
-        # 'NAME': 'sdocs',
-        # 'USER': 'sdocs',
-        # 'PASSWORD': os.getenv('PSQLPASSWORD'),
-        # 'HOST': os.getenv('PSQLHOST', '127.0.0.1'),
-        # 'PORT': 5432,
-
         'HOST': os.getenv('DB_HOST'),
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_NAME'),

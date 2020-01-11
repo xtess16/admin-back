@@ -2,5 +2,6 @@
 sdocsenv
 db.sqlite3
 .env
+docker-compose.yml
 __pycache__/
 .idea/

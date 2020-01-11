@@ -30,7 +30,8 @@ def check_auth(request):
             'users': users_ser.data,
             'info': {
                 'groups': groups_ser.data,
-                'permissions': permissions_ser.data
+                'permissions': permissions_ser.data,
+                'qwe': 'qwe2'
             }
         }, safe=False)
 
